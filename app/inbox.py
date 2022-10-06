@@ -18,7 +18,7 @@ def getDB():
 def show():
     db = get_db()
     messages = db.execute(
-        'select * from message where to_id =?',(g.user['id'])
+        'select * from message where to_id =?',(g.user['id'],)
     ).fetchall()
 
     return render_template('inbox/show.html', messages=messages)
