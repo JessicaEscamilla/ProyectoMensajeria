@@ -33,6 +33,7 @@ def activate():
                 db.execute(
                     'update activationlink set challenge = ? where id = ?', (utils.U_CONFIRMED, attempt['id'])
                 )
+                
                 db.execute(
                     'Insert into user (username, password, salt, email) values (?,?,?,?)', (attempt['username'], attempt['password'], attempt['salt'], attempt['email'])
                 )
@@ -152,19 +153,23 @@ def confirm():
                 flash(error)
                 return render_template('auth/change.html', number=authid)
 
-            db = ''
+            db = get_db()
             attempt = db.execute(
-                '', (authid, utils.F_ACTIVE)
+                'select * from forgotlink where challenge = ? and state = ?', (authid, utils.F_ACTIVE)
             ).fetchone()
+            print(attempt['userid'])
             
             if attempt is not None:
                 db.execute(
-                    '', (utils.F_INACTIVE, attempt['id'])
+                    'update forgotlink set state = ? where id = ?', (utils.F_INACTIVE, attempt['id'])
                 )
+                db.commit()
                 salt = hex(random.getrandbits(128))[2:]
                 hashP = generate_password_hash(password + salt)   
+                
+                print(hashP, salt, attempt['userid'])
                 db.execute(
-                    '', (hashP, salt, attempt['userid'])
+                    'update user set password = ?, salt = ? where id = ?', (hashP, salt, attempt['userid'])
                 )
                 db.commit()
                 return redirect(url_for('auth.login'))
@@ -188,7 +193,7 @@ def change():
             
             db = get_db()
             attempt = db.execute(
-                '', (number, utils.F_ACTIVE)
+                'select * from forgotlink where challenge = ? and state = ?', (number, utils.F_ACTIVE)
             ).fetchone()
             
             if attempt is not None:
@@ -215,18 +220,18 @@ def forgot():
 
             db = get_db()
             user = db.execute(
-                '', (email,)
+                'select * from user where email = ?', (email,)
             ).fetchone()
 
             if user is not None:
                 number = hex(random.getrandbits(512))[2:]
                 
                 db.execute(
-                    '',
+                    'update forgotlink set state = ? where userid = ?',
                     (utils.F_INACTIVE, user['id'])
                 )
                 db.execute(
-                    '',
+                    'insert into forgotlink (userid, challenge, state) values (?, ?, ?)',
                     (user['id'], number, utils.F_ACTIVE)
                 )
                 db.commit()
