@@ -7,15 +7,15 @@
   </head>
   <body class="max-w-lg mx-auto rounded-md">
     <nav class="rounded-t-md prose">
-      <h1 class="m-0 ml-1">Demo</h1>
+      <h1 class="m-0 ml-1">Proyecto Mensajería</h1>
       <ul class="m-0">
         {% if g.user %}
           <li><span>{{ g.user['username'] }}</span>
-          <li><a href="{{ url_for('auth.logout') }}">Logout</a>
+          <li><a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
         {% else %}
-          <li><a href="{{ url_for('auth.register') }}">Register</a>
-          <li><a href="{{ url_for('auth.login') }}">Login</a>
-          <li><a href="{{ url_for('auth.forgot') }}">Forgot your password?</a>
+          <li><a href="{{ url_for('auth.register') }}">Registrarse</a>
+          <li><a href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+          <li><a href="{{ url_for('auth.forgot') }}">Olvido su contraseña?</a>
         {% endif %}
       </ul>
     </nav>
